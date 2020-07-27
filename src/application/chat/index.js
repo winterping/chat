@@ -8,8 +8,8 @@ function Index(props) {
     const id = parseInt(props.match.params.id);
     const [userid, setUserid] = useState()
     const [toUserInfo, setToUserInfo] = useState({})
-    const [msgBox, setMsgBox] = useState([])
     const [ws, setWs] = useState()
+    const {}=props
     const friendList = id == 6773200 ? [
         {
             name: '张三',
@@ -17,12 +17,6 @@ function Index(props) {
             id: 6773201,
             type: 'friend',
         },
-        // {
-        //     name: '王五',
-        //     avatar: 'https://p2.music.126.net/LCWqYYKoCEZKuAC3S3lIeg==/109951165034938865.jpg',
-        //     id: 6773202,
-        //     type: 'friend',
-        // },
     ] : [
             {
                 name: '李四',
@@ -32,7 +26,6 @@ function Index(props) {
             }
         ]
     useEffect(() => {
-        console.log('id',id);
         setUserid(id)
         setToUserInfo(Object.assign(friendList[0]))
     }, [])
@@ -43,7 +36,6 @@ function Index(props) {
             ws.onmessage = function (event) {
                 // console.log('event', JSON.parse(event.data));
                 var msg = JSON.parse(event.data);
-                setMsgBox(msgBox.concat(msg))
             };
             ws.onopen = function (event) {
                 console.log('连接socket');
@@ -79,7 +71,6 @@ function Index(props) {
     //发送文本消息
     let sendTxt = (msg) => {
         const result = msgModel(msg, 1)
-        console.log('ws',ws);
         ws.send(result);
     }
     return (
