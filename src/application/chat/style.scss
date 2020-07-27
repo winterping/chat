@@ -26,6 +26,8 @@
             flex: 1;
             padding: 10px;
             box-sizing: border-box;
+            overflow-y: auto;
+
             span {
                 padding: 5px 5px;
                 white-space: pre-line;

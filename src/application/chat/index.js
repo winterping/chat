@@ -4,12 +4,14 @@ import FriendList from '../../components/friend-list/index'
 import Send from '../../components/send/index'
 import MessageMe from '../../components/message-me/index'
 import MessageOther from '../../components/message-other/index'
+import {connect} from 'react-redux'
+import {addMsg} from './store/index'
 function Index(props) {
     const id = parseInt(props.match.params.id);
     const [userid, setUserid] = useState()
     const [toUserInfo, setToUserInfo] = useState({})
     const [ws, setWs] = useState()
-    const {}=props
+    const {msgBox,addMessageDispatch}=props
     const friendList = id == 6773200 ? [
         {
             name: '张三',
@@ -29,13 +31,14 @@ function Index(props) {
         setUserid(id)
         setToUserInfo(Object.assign(friendList[0]))
     }, [])
-    useEffect(() => {
+    useEffect(() => {   
         var ws;
         if (window.WebSocket) {
             ws = new WebSocket("ws://localhost:8080/ws");
             ws.onmessage = function (event) {
                 // console.log('event', JSON.parse(event.data));
                 var msg = JSON.parse(event.data);
+                addMessageDispatch(msg)
             };
             ws.onopen = function (event) {
                 console.log('连接socket');
@@ -70,7 +73,7 @@ function Index(props) {
 
     //发送文本消息
     let sendTxt = (msg) => {
-        const result = msgModel(msg, 1)
+        const result = msgModel(msg, 0)
         ws.send(result);
     }
     return (
@@ -81,7 +84,7 @@ function Index(props) {
             <div className='msg-content'>
                 <div className='msg-list'>
                     {
-                        msgBox.map(item => {
+                        msgBox.toJS().map(item => {
                             if (item.type == 'friend') {
                                 if (item.fromuserid == userid) {
                                     return <MessageMe item={item} key={item.time} />
@@ -100,4 +103,16 @@ function Index(props) {
     )
 }
 
-export default React.memo(Index)
+const mapStateToProps=(state)=>({
+    msgBox:state.getIn(['message', 'msgBox'])
+})
+
+const mapDispatchToProps=(dispatch)=>{
+    return{
+        addMessageDispatch(msg){
+            dispatch(addMsg(msg))
+        }
+    }
+}
+
+export default connect(mapStateToProps,mapDispatchToProps)(React.memo(Index))
