@@ -10,13 +10,14 @@ import { uuidGenerator } from '../../api/utils'
 function Index(props) {
     const id = parseInt(props.match.params.id);
     const [userid, setUserid] = useState()
+    const [list, setList] = useState([])
     const [toUserInfo, setToUserInfo] = useState({})
     const [msg, setMsg] = useState({})
     const [ws, setWs] = useState()
     const { msgBox, addMessageDispatch, deleteMessageDispatch } = props
     const msgRef = useRef()
     const tabRef = useRef()
-    const friendList = id == 6773200 ? [
+    let friendList = id == 6773200 ? [
         {
             name: '张三',
             avatar: 'https://p2.music.126.net/uTwOm8AEFFX_BYHvfvFcmQ==/109951164232057952.jpg',
@@ -39,7 +40,7 @@ function Index(props) {
                 }, {
                     name: '王五',
                     avatar: 'https://p1.music.126.net/tMH2KjUioNW57zbixCA5Pg==/109951164158510116.jpg',
-                    id: 6773201,
+                    id: 6773202,
                 },
             ]
         }
@@ -66,7 +67,7 @@ function Index(props) {
                     }, {
                         name: '王五',
                         avatar: 'https://p1.music.126.net/tMH2KjUioNW57zbixCA5Pg==/109951164158510116.jpg',
-                        id: 6773201,
+                        id: 6773202,
                     }
                 ]
             }
@@ -75,6 +76,7 @@ function Index(props) {
     useEffect(() => {
         setUserid(id)
         setToUserInfo(Object.assign(friendList[0]))
+        setList(friendList)
     }, [])
 
     useEffect(() => {
@@ -181,10 +183,27 @@ function Index(props) {
         dom.style.display = 'none';
     }
 
+    let addOnePeople=(item)=>{
+        const data=list;
+        for(let i=0,len=data.length;i<len;i++){
+            if(data[i].id==item.id){
+                data[i].members.push({
+                    name: '松鼠',
+                    avatar: 'https://p1.music.126.net/tMH2KjUioNW57zbixCA5Pg==/109951164158510116.jpg',
+                    id: 6773203,
+                })
+            }
+        }
+        setList(data.concat());
+    }
     return (
         <div className='chat-container'>
             <div className='friend-list'>
-                <FriendList friendList={friendList} activeId={toUserInfo.id ? toUserInfo.id : ''} changeFriend={changeFriend}></FriendList>
+                <FriendList friendList={list} 
+                activeId={toUserInfo.id ? toUserInfo.id : ''} 
+                changeFriend={changeFriend}
+                addOnePeople={addOnePeople}
+                ></FriendList>
             </div>
             <div className='msg-content' onClick={() => closeTab()}>
                 <div className='msg-list' ref={msgRef}>

@@ -3,9 +3,10 @@ import './style.scss'
 
 function Index(props) {
     const { friendList, activeId } = props;
-    const { changeFriend } = props;
+    const { changeFriend ,addOnePeople} = props;
 
-    let contextMenu = (e) => {
+    let contextMenu = (e,item) => {
+        addOnePeople(item)
         e.preventDefault();
     }
     return (
@@ -19,7 +20,7 @@ function Index(props) {
                         </div> :
                         <div key={item.id} className={`content ${activeId == item.id ? 'active' : ''}`}
                             onClick={() => changeFriend(item)}
-                            onContextMenu={(e) => contextMenu(e)}>
+                            onContextMenu={(e) => contextMenu(e,item)}>
                             <ul>
                                 {
                                     item.members.map(ele => (
