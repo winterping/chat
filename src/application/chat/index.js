@@ -41,36 +41,6 @@ function Index(props) {
                     avatar: 'https://p1.music.126.net/tMH2KjUioNW57zbixCA5Pg==/109951164158510116.jpg',
                     id: 6773201,
                 },
-                {
-                    name: '王五',
-                    avatar: 'https://p1.music.126.net/tMH2KjUioNW57zbixCA5Pg==/109951164158510116.jpg',
-                    id: 6773201,
-                },
-                {
-                    name: '王五',
-                    avatar: 'https://p1.music.126.net/tMH2KjUioNW57zbixCA5Pg==/109951164158510116.jpg',
-                    id: 6773201,
-                },
-                // {
-                //     name: '王五',
-                //     avatar: 'https://p1.music.126.net/tMH2KjUioNW57zbixCA5Pg==/109951164158510116.jpg',
-                //     id: 6773201,
-                // },
-                // {
-                //     name: '王五',
-                //     avatar: 'https://p1.music.126.net/tMH2KjUioNW57zbixCA5Pg==/109951164158510116.jpg',
-                //     id: 6773201,
-                // },
-                // {
-                //     name: '王五',
-                //     avatar: 'https://p1.music.126.net/tMH2KjUioNW57zbixCA5Pg==/109951164158510116.jpg',
-                //     id: 6773201,
-                // },
-                // {
-                //     name: '王五',
-                //     avatar: 'https://p1.music.126.net/tMH2KjUioNW57zbixCA5Pg==/109951164158510116.jpg',
-                //     id: 6773201,
-                // }
             ]
         }
     ] : [
