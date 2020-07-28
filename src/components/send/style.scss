@@ -5,22 +5,27 @@
     padding: 10px;
     display: flex;
     flex-direction: column;
-    .operate{
-        i{
+
+    // position: relative;
+    .operate {
+        i {
             display: inline-block;
             width: 30px;
             height: 30px;
             cursor: pointer;
-            &.icon-upload{
+
+            &.icon-upload {
                 background: url('../../assets/file.png') no-repeat;
                 background-size: 100% auto;
             }
         }
     }
+
     .input-box {
         flex: 1;
         position: relative;
-        textarea {
+
+        .edit {
             display: block;
             width: 100%;
             padding: 5px 0 0 0;
@@ -28,10 +33,47 @@
             margin-bottom: 20px;
             line-height: 20px;
             border: none;
-            outline:none;
+            outline: none;
             overflow: auto;
             resize: none;
             background: none;
+        }
+    }
+
+    .bg-container {
+        position: absolute;
+        width: 240px;
+        height: 240px;
+        background-color: #b8aeae;
+        top: 50%;
+        left: 50%;
+        margin-left: -120px;
+        margin-top: -120px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        img {
+            width: 120px;
+            height: auto;
+            margin-bottom: 30px;
+        }
+
+        span {
+            padding: 5px 20px;
+            border-radius: 5px;
+            color: #fff;
+            cursor: pointer;
+
+            &:first-child {
+                margin-right: 20px;
+                background-color: rgb(63, 91, 184);
+            }
+            &:last-child{
+                background-color: #fff;
+                color: rgb(63, 91, 184);
+            }
         }
     }
 }

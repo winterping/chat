@@ -1,63 +1,101 @@
 import React, { useEffect, useState, useRef } from 'react'
 import './style.scss'
+import axios from 'axios';
 
 function Index(props) {
     const sendRef = useRef()
-    const textareaRef = useRef()
     const [txt, setTxt] = useState()
     const { sendTxt } = props
+    const [uploadImg, setUploadImg] = useState(false)
+    const [imgUrl, setImgUrl] = useState('')
+
     let changeTxt = (e) => {
-        setTxt(e.target.value)
+        setTxt(e.target.value);
     }
+
     let send = (e) => {
         var keyCode = e.keyCode || e.which || e.charCode;
         var ctrlKey = e.ctrlKey || e.metaKey;
-        // 判断 ctrl+enter 换行
         if (ctrlKey && keyCode == 13) {
             setTxt(txt + "\n")
         } else if (keyCode == 13) {
-            // 阻止提交自动换行
             e.preventDefault();
-            if(txt){
-                sendTxt(txt);
+            if (txt) {
+                sendTxt(txt, 0);
             }
             setTxt('')
         }
     }
-    let handleImageChange=(e)=>{
+    let handleImageChange = (e) => {
         const file = e.target.files[0];
-        const windowURL = window.URL || window.webkitURL;//实现预览
-        const dataURl = windowURL.createObjectURL(file);//硬盘或sd卡指向文件路径
-        console.log('file',dataURl);
-        var d=document.createElement('img')
-        var image=new Image()
-        image.src='https://p1.music.126.net/Cmn04lf1X-DvUvm5YdVm8w==/109951164681628808.jpg';
-        var textaaa=textareaRef.current
-        console.log('textaaa',textaaa);
-        
-        textaaa.appendChild(image)
+        const fileName = file.name;
+        var pettern = /\.(png|jpg|jpeg|gif|mp3|mp4)$/;
+        if (!pettern.test(fileName)) {
+            alert("图片格式错误,请重新上传");
+            return;
+        }
+        let data = new FormData();
+        data.append('imgName', fileName);
+        data.append('img', file);
+        axios({
+            method: 'post',
+            url: 'http://localhost:3001/uploadImg',
+            data: data
+        })
+            .then(res => {
+                console.log(res.data);
+                const dataUrl = `http://localhost:3001/${res.data}`
+                setUploadImg(true);
+                setImgUrl(dataUrl);
+            })
+            .catch(error => {
+                alert('上传错误,请重新上传')
+                console.log(error)
+            })
+        // const windowURL = window.URL || window.webkitURL;
+        // const dataURl = windowURL.createObjectURL(file);
     }
-    let addImage=()=>{
-        let inputImg=sendRef.current
+
+    let addImage = () => {
+        let inputImg = sendRef.current
         inputImg.click()
     }
+
+    let sendImg = () => {
+        sendTxt(imgUrl, 1);
+        setUploadImg(false);
+    }
+
+    let closePhoto = () => {
+        setUploadImg(false);
+    }
+
     return (
         <div className='send-container'>
             <div className='operate'>
-                <i className='icon-upload' onClick={()=>addImage()}></i>
+                <i className='icon-upload' onClick={() => addImage()}></i>
                 <input
-                   style={{
-                     display:'none'
-                   }}
-                   ref={sendRef}
-                   type='file'
-                   accept='image/*'
-                   onChange={(e)=>handleImageChange(e)}
-        />
+                    style={{
+                        display: 'none'
+                    }}
+                    ref={sendRef}
+                    type='file'
+                    accept='image/*'
+                    onChange={(e) => handleImageChange(e)}
+                />
             </div>
             <div className='input-box'>
-                <textarea ref={textareaRef} onKeyDown={(e) => send(e)} value={txt} onChange={(e) => changeTxt(e)}></textarea>
+                <textarea onKeyDown={(e) => send(e)} value={txt} onChange={(e) => changeTxt(e)} className='edit'></textarea>
             </div>
+            {
+                uploadImg ? <div className='bg-container'>
+                    <img src={imgUrl} />
+                    <div className='operate'>
+                        <span onClick={() => sendImg()}>Send</span>
+                        <span onClick={() => closePhoto()}>Cancel</span>
+                    </div>
+                </div> : null
+            }
         </div>
     )
 }

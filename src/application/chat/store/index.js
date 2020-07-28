@@ -17,14 +17,17 @@ export const addMsg = (msg) => {
     }
 }
 
+export const deleteMsg = (id) => {
+    return (dispatch, getState) => {
+        const list = getState().getIn(['message', 'msgBox']).toJS();
+        const newList = list.filter(item => item.local_msg_id != id)
+        dispatch(changeMsg(newList))
+    }
+}
+
 const defaultState = fromJS({
     msgBox: [],
 })
-
-// const defaultState = {
-//     msgBox: [],
-// }
-
 
 const reducer = (state = defaultState, action) => {
     switch (action.type) {
