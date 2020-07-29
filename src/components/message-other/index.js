@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import './style.scss'
 
+
 function Index(props) {
     const { item, avatar } = props;
     let showMsg = () => {

@@ -7,6 +7,8 @@ import MessageOther from '../../components/message-other/index'
 import { connect } from 'react-redux'
 import { addMsg, deleteMsg } from './store/index'
 import { uuidGenerator } from '../../api/utils'
+import { message } from 'antd'
+
 function Index(props) {
     const id = parseInt(props.match.params.id);
     const [userid, setUserid] = useState()
@@ -16,7 +18,7 @@ function Index(props) {
     const [ws, setWs] = useState()
     const { msgBox, addMessageDispatch, deleteMessageDispatch } = props
     const msgRef = useRef()
-    const tabRef = useRef()
+
     let friendList = id == 6773200 ? [
         {
             name: '张三',
@@ -102,7 +104,22 @@ function Index(props) {
     let msgOperate = (msg) => {
         console.log('msg', msg);
         if (msg.type == 'system') {
-            deleteMessageDispatch(msg.msg_content)
+            switch (msg.msg_type) {
+                case 100:
+                    deleteMessageDispatch(msg.msg_content)
+                    break;
+                case 101:
+                    const addList = msg.newMember;
+                    for (let i = 0, len = friendList.length; i < len; i++) {
+                        if (friendList[i].id == msg.groupid) {
+                            friendList[i].members = friendList[i].members.concat(addList);
+                            setList(friendList.concat());
+                            message.success('有人加入群聊');
+                            document.body.click()
+                            return;
+                        }
+                    }
+            }
         } else {
             addMessageDispatch(msg)
             scrollToBottom()
@@ -132,17 +149,16 @@ function Index(props) {
     }
 
     //系统消息模型
-    let sysModel = (msg, msg_type) => {
+    let sysModel = (msgObj) => {
         var obj = {
-            // fromuserid: userid,
+            fromuserid: userid,
             // touserid: toUserInfo.id,
             type: 'system',
-            msg_type: msg_type,
-            msg_content: msg,
             time: new Date().getTime(),
             local_msg_id: uuidGenerator()
         }
-        return JSON.stringify(obj);
+        var res = Object.assign(obj, msgObj);
+        return JSON.stringify(res);
     }
 
     //切换好友列表
@@ -159,53 +175,45 @@ function Index(props) {
     }
 
     //消息的撤回
-    let deleteOneMsg = (item, X, Y) => {
-        const dom = tabRef.current;
-        dom.style.display = 'block';
-        dom.style.left = X - 550 + 'px';
-        dom.style.top = Y - 30 + 'px';
-        setMsg(item)
-    }
-
-    let rebackMsg = (e) => {
-        e.stopPropagation()
-        if (new Date().getTime() - msg.time > 1000 * 60 * 2) {
+    let deleteOneMsg = (item) => {
+        if (new Date().getTime() - item.time > 1000 * 60 * 2) {
             alert('该消息不能撤回')
         } else {
-            const result = sysModel(msg.local_msg_id, 100) //100代表着撤回消息
+            const msgObj = {
+                msg_type: 100, //100代表着撤回消息
+                msg_content: item.local_msg_id,
+            }
+            const result = sysModel(msgObj)
             ws.send(result);
         }
-        closeTab()
     }
 
-    let closeTab = () => {
-        const dom = tabRef.current;
-        dom.style.display = 'none';
-    }
-
-    let addOnePeople=(item)=>{
-        const data=list;
-        for(let i=0,len=data.length;i<len;i++){
-            if(data[i].id==item.id){
-                data[i].members.push({
+    let addOnePeople = (item) => {
+        const msgObj = {
+            msg_type: 101, //代表拉人进群
+            newMember: [
+                {
                     name: '松鼠',
                     avatar: 'https://p1.music.126.net/tMH2KjUioNW57zbixCA5Pg==/109951164158510116.jpg',
                     id: 6773203,
-                })
-            }
+                }
+            ],
+            groupid: item.id
         }
-        setList(data.concat());
+        const result = sysModel(msgObj) //100代表着撤回消息
+        ws.send(result);
     }
+
     return (
         <div className='chat-container'>
             <div className='friend-list'>
-                <FriendList friendList={list} 
-                activeId={toUserInfo.id ? toUserInfo.id : ''} 
-                changeFriend={changeFriend}
-                addOnePeople={addOnePeople}
+                <FriendList friendList={list}
+                    activeId={toUserInfo.id ? toUserInfo.id : ''}
+                    changeFriend={changeFriend}
+                    addOnePeople={addOnePeople}
                 ></FriendList>
             </div>
-            <div className='msg-content' onClick={() => closeTab()}>
+            <div className='msg-content'>
                 <div className='msg-list' ref={msgRef}>
                     {
                         msgBox.toJS().map(item => {
@@ -218,9 +226,6 @@ function Index(props) {
                             }
                         })
                     }
-                    <div className='tab'>
-                        <p ref={tabRef} className='back' onClick={(e) => rebackMsg(e)}>撤回消息</p>
-                    </div>
                 </div>
                 <div className='send-msg'>
                     <Send sendTxt={sendTxt}></Send>
